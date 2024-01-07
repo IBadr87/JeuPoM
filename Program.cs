@@ -34,15 +34,16 @@ namespace JeuPoM
         {
             Console.WriteLine(message);
             string input = Console.ReadLine();
+            int Output;
 
-            if (int.TryParse(input, out int result))
+            // TODO : Exercice 2 (Mise en œuvre de la levée d’exception)
+            if (int.TryParse(input, out Output))
             {
-                return result;
+                return Output;
             }
             else
             {
-                Console.WriteLine("La saisie n'est pas un entier valide. La valeur par défaut (0) sera utilisée.");
-                return 0;
+                throw new Exception("La valeur saisie n'est pas valide.");
             }
         }
 
@@ -67,7 +68,16 @@ namespace JeuPoM
             while (!Trouve)
             {
                 // TODO : Exercice 1.5 (Modularisation des interactions utilisateurs)
-                valeurSaisie = GetInt("Veuillez saisir un nombre entier entre 0 et 100: ");
+                // TODO : Exercice 3 (Capture d’exception)
+                try
+                {
+                    valeurSaisie = GetInt("Veuillez saisir un nombre entier entre 0 et 100: ");
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine("Erreur : " + ex.Message);
+                    continue;
+                }
 
                 nbTentative++;
 
@@ -97,17 +107,25 @@ namespace JeuPoM
                     nbParties++;
 
                     // TODO : Exercice 1.4 (Modularisation des interactions utilisateurs)
-                    reponse = GetString("Voulez-vous rejouer une nouvelle partie ? (O/N): \n");
+                    // TODO : Exercice 3.1 (Capture d’exception)
+                    reponse = GetString("Voulez-vous rejouer une nouvelle partie ? (O/N): ");
 
-
-                    if (reponse != "O" && reponse != "o")
+                    try
                     {
-                        Trouve = true;
+                        if (reponse != "O" && reponse != "o")
+                        {
+                            throw new Exception("La valeur saisie n'est pas valide, SVP entrez 'O' ou 'N'");
+                        }
+                        else
+                        {
+                            nbTentative = 0;
+                            valeurSecrete = rnd.Next(100);
+                        }
                     }
-                    else
+                    catch (Exception ex)
                     {
-                        nbTentative = 0;
-                        valeurSecrete = rnd.Next(100);
+                        Console.WriteLine("Erreur : " + ex.Message);
+                        continue;
                     }
                 }
             }
