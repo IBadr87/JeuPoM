@@ -4,6 +4,8 @@ using System.Diagnostics.Eventing.Reader;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.IO;
+using System.Windows.Forms;
 
 namespace JeuPoM
 {
@@ -19,8 +21,33 @@ namespace JeuPoM
 
             for (int i = 0; i < compteur; i++)
             {
-                Console.WriteLine("Partie " + (i + 1) + ": Valeur secrète = " + tabValeur[i] + ", Tentatives = " + tabCoup[i]);
+                Console.WriteLine("Partie " + (i + 1) + ": Valeur secrète = " + tabValeur[i] + ", Tentatives = " +
+                                  tabCoup[i]);
             }
+        }
+
+        // TODO Mo.5 (Génération d’un fichier d’historique)
+        static void afficheHistorique(int compteur, int[] tabValeur, int[] tabCoup, string nomFichier)
+        {
+            try
+            {
+                FileStream fs = new FileStream(nomFichier, FileMode.Create, FileAccess.Write);
+                StreamWriter sw = new StreamWriter(fs);
+
+                sw.WriteLine("Historique des parties : ");
+
+                for (int i = 0; i < compteur; i++)
+                {
+                    sw.WriteLine("Partie " + (i + 1) + ": Valeur secrète = " + tabValeur[i] + ", Tentatives = " + tabCoup[i]);
+                }
+                sw.Close();
+                fs.Close();
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("Erreur : " + e.Message);
+            }
+            
         }
 
         // TODO : Exercice 1.3 (Modularisation des interactions utilisateurs)
@@ -47,25 +74,23 @@ namespace JeuPoM
             }
         }
 
-        static void Main (string [] args)
+        // Variables declaration and initiation 
+        static int valeurSecrete, valeurSaisie;
+        static string reponse;
+
+        static int nbTentative = 0;
+        static int meilleurScore = 50;
+
+        static int[] historiqueTentative = new int[20];
+        static int[] historiqueValeur = new int[20];
+        static int nbParties = 0;
+
+        static void Jouer()
         {
-
-            // Variables declaration and initiation 
-            int valeurSecrete, valeurSaisie;
-            string reponse;
-
-            int nbTentative = 0;
-            int meilleurScore = 50;
-
-            int[] historiqueTentative = new int[20];
-            int[] historiqueValeur = new int[20];
-            int nbParties = 0;
-
             Random rnd = new Random();
             valeurSecrete = rnd.Next(100);
 
-            bool Trouve = false;
-            while (!Trouve)
+            do
             {
                 // TODO : Exercice 1.5 (Modularisation des interactions utilisateurs)
                 // TODO : Exercice 3 (Capture d’exception)
@@ -105,33 +130,78 @@ namespace JeuPoM
                     historiqueValeur[nbParties] = valeurSecrete;
                     historiqueTentative[nbParties] = nbTentative;
                     nbParties++;
+                }
+            } while (valeurSaisie != valeurSecrete);
+        }
 
-                    // TODO : Exercice 1.4 (Modularisation des interactions utilisateurs)
-                    // TODO : Exercice 3.1 (Capture d’exception)
-                    reponse = GetString("Voulez-vous rejouer une nouvelle partie ? (O/N): ");
+        static void ReJouer()
+        {
+            Random rnd = new Random();
+            valeurSecrete = rnd.Next(100);
 
-                    try
+            // TODO : Exercice 1.4 (Modularisation des interactions utilisateurs)
+            // TODO : Exercice 3.1 (Capture d’exception)
+            
+            bool continuerJeu = false;
+            while (!continuerJeu)
+            {
+                reponse = GetString("Voulez-vous rejouer une nouvelle partie ? (O/N): \n");
+                try
+                {
+                    if (reponse.ToLower() == "o")
                     {
-                        if (reponse != "O" && reponse != "o")
-                        {
-                            throw new Exception("La valeur saisie n'est pas valide, SVP entrez 'O' ou 'N'");
-                        }
-                        else
-                        {
-                            nbTentative = 0;
-                            valeurSecrete = rnd.Next(100);
-                        }
+                        Jouer();
+
+                        nbTentative = 0;
+                        valeurSecrete = rnd.Next(100);
+
                     }
-                    catch (Exception ex)
+                    else if (reponse.ToLower() == "n")
                     {
-                        Console.WriteLine("Erreur : " + ex.Message);
-                        continue;
+                        continuerJeu = false;
+                        Console.WriteLine("Meilleur score : " + meilleurScore + "\n");
+
+                        break;
+                    }
+                    else
+                    {
+                        throw new Exception("La valeur saisie n'est pas valide, SVP entrez 'O' ou 'N'");
                     }
                 }
+                catch (Exception ex)
+                {
+                    Console.WriteLine("Erreur : " + ex.Message);
+                    continue;
+                }
             }
+            InfoSaveInFile();
+        }
 
+        static void InfoSaveInFile()
+        {
             // TODO : Exercice 1.2 (Modularisation de l’affichage d’historique)
-            afficheHistorique(nbParties, historiqueValeur, historiqueTentative);
+
+            SaveFileDialog saveFileDialog = new SaveFileDialog();
+            saveFileDialog.Filter = "Text Files (*.txt)|*.txt";
+            saveFileDialog.FileName = "GAM.txt";
+            saveFileDialog.Title = "Save As";
+
+            if (saveFileDialog.ShowDialog() == DialogResult.OK)
+            {
+                afficheHistorique(nbParties, historiqueValeur, historiqueTentative, saveFileDialog.FileName);
+            }
+            else
+            {
+                afficheHistorique(nbParties, historiqueValeur, historiqueTentative);
+            }
+        }
+
+        [STAThread]
+        static void Main(string[] args)
+        {
+
+            Jouer();
+            ReJouer();
 
             Console.WriteLine("Appuyez sur n'importe quelle touche pour quitter...");
             Console.ReadKey();

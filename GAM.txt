@@ -1,0 +1,4 @@
+Historique des parties : 
+Partie 1: Valeur secrète = 8, Tentatives = 3
+Partie 2: Valeur secrète = 62, Tentatives = 9
+Partie 3: Valeur secrète = 64, Tentatives = 0
