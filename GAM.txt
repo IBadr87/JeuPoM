@@ -1,4 +1,4 @@
 Historique des parties : 
-Partie 1: Valeur secrète = 8, Tentatives = 3
-Partie 2: Valeur secrète = 62, Tentatives = 9
-Partie 3: Valeur secrète = 64, Tentatives = 0
+Partie N°1, 27 trouvé en 8 coup(s)
+Partie N°2, 33 trouvé en 7 coup(s)
+Le Meilleur Score est : 7

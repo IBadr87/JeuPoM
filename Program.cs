@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.IO;
 using System.Windows.Forms;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 
 namespace JeuPoM
 {
@@ -14,20 +15,30 @@ namespace JeuPoM
         // This code is designed to allow users to guess a random number and track their best score and game history.
         // The game loop ensures that the user can play multiple times if they wish. 
 
+
+        // Variables declaration and initiation 
+        static int valeurSecrete, valeurSaisie;
+        static string reponse;
+
+        static int tentatives = 0;
+        static int meilleurScore = 50;
+
+        static Partie[] historique = new Partie[20];
+        static int Parties = 0;
+
         // TODO : Exercise 1.1 (Modularisation de l’affichage d’historique)
-        static void afficheHistorique(int compteur, int[] tabValeur, int[] tabCoup)
+        static void afficheHistorique(int compteur, Partie[] tab)
         {
             Console.WriteLine("Historique des parties : ");
 
             for (int i = 0; i < compteur; i++)
             {
-                Console.WriteLine("Partie " + (i + 1) + ": Valeur secrète = " + tabValeur[i] + ", Tentatives = " +
-                                  tabCoup[i]);
+                Console.WriteLine("Partie N°{0}, " + tab[i].info(), i + 1);
             }
         }
 
         // TODO Mo.5 (Génération d’un fichier d’historique)
-        static void afficheHistorique(int compteur, int[] tabValeur, int[] tabCoup, string nomFichier)
+        static void afficheHistorique(int compteur, Partie[] tab, string nomFichier)
         {
             try
             {
@@ -38,8 +49,11 @@ namespace JeuPoM
 
                 for (int i = 0; i < compteur; i++)
                 {
-                    sw.WriteLine("Partie " + (i + 1) + ": Valeur secrète = " + tabValeur[i] + ", Tentatives = " + tabCoup[i]);
+                    sw.WriteLine("Partie N°{0}, " + tab[i].info(), i + 1);
                 }
+
+                sw.WriteLine("Le Meilleur Score est : " + meilleurScore);
+
                 sw.Close();
                 fs.Close();
             }
@@ -74,17 +88,6 @@ namespace JeuPoM
             }
         }
 
-        // Variables declaration and initiation 
-        static int valeurSecrete, valeurSaisie;
-        static string reponse;
-
-        static int nbTentative = 0;
-        static int meilleurScore = 50;
-
-        static int[] historiqueTentative = new int[20];
-        static int[] historiqueValeur = new int[20];
-        static int nbParties = 0;
-
         static void Jouer()
         {
             Random rnd = new Random();
@@ -104,7 +107,7 @@ namespace JeuPoM
                     continue;
                 }
 
-                nbTentative++;
+                tentatives++;
 
                 if (valeurSaisie > valeurSecrete)
                 {
@@ -118,18 +121,17 @@ namespace JeuPoM
                 {
                     Console.WriteLine("Félicitations ! Vous avez trouvé la valeur correcte. \n");
 
-                    Console.WriteLine("Nombre du Tentative: " + nbTentative);
+                    Console.WriteLine("Nombre du Tentatives : " + tentatives);
 
-                    if (nbTentative < meilleurScore)
+                    if (tentatives < meilleurScore)
                     {
-                        meilleurScore = nbTentative;
+                        meilleurScore = tentatives;
                     }
 
                     Console.WriteLine("Meilleur score : " + meilleurScore + "\n");
 
-                    historiqueValeur[nbParties] = valeurSecrete;
-                    historiqueTentative[nbParties] = nbTentative;
-                    nbParties++;
+                    historique[Parties] = new Partie(valeurSecrete, tentatives);
+                    Parties++;
                 }
             } while (valeurSaisie != valeurSecrete);
         }
@@ -150,15 +152,17 @@ namespace JeuPoM
                 {
                     if (reponse.ToLower() == "o")
                     {
+                        tentatives = 0;
+
                         Jouer();
 
-                        nbTentative = 0;
                         valeurSecrete = rnd.Next(100);
 
                     }
                     else if (reponse.ToLower() == "n")
                     {
                         continuerJeu = false;
+
                         Console.WriteLine("Meilleur score : " + meilleurScore + "\n");
 
                         break;
@@ -188,11 +192,11 @@ namespace JeuPoM
 
             if (saveFileDialog.ShowDialog() == DialogResult.OK)
             {
-                afficheHistorique(nbParties, historiqueValeur, historiqueTentative, saveFileDialog.FileName);
+                afficheHistorique(Parties, historique, saveFileDialog.FileName);
             }
             else
             {
-                afficheHistorique(nbParties, historiqueValeur, historiqueTentative);
+                afficheHistorique(Parties, historique);
             }
         }
 
