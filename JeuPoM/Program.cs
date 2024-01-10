@@ -7,6 +7,8 @@ using System.Threading.Tasks;
 using System.IO;
 using System.Windows.Forms;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement;
+using Info;
+using System.Net.NetworkInformation;
 
 namespace JeuPoM
 {
@@ -163,7 +165,7 @@ namespace JeuPoM
                     {
                         continuerJeu = false;
 
-                        Console.WriteLine("Meilleur score : " + meilleurScore + "\n");
+                        Console.WriteLine("Le Meilleur score est : " + meilleurScore + "\n");
 
                         break;
                     }
@@ -204,6 +206,17 @@ namespace JeuPoM
         static void Main(string[] args)
         {
 
+            Personne joueur = null;
+
+            string reponse = GetString("Souhaitez-vous vous identifier? (O/N): ");
+
+            if (reponse.ToLower() == "o")
+            {
+                string nom = GetString("\n Quel est votre nom ? ");
+                string prenom = GetString("\n Quel est votre prenom ? ");
+                joueur = new Personne(nom, prenom);
+            }
+            
             Jouer();
             ReJouer();
 
