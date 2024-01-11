@@ -28,44 +28,6 @@ namespace JeuPoM
         static Partie[] historique = new Partie[20];
         static int Parties = 0;
 
-        // TODO : Exercise 1.1 (Modularisation de l’affichage d’historique)
-        static void afficheHistorique(int compteur, Partie[] tab)
-        {
-            Console.WriteLine("Historique des parties : ");
-
-            for (int i = 0; i < compteur; i++)
-            {
-                Console.WriteLine("Partie N°{0}, " + tab[i].info(), i + 1);
-            }
-        }
-
-        // TODO Mo.5 (Génération d’un fichier d’historique)
-        static void afficheHistorique(int compteur, Partie[] tab, string nomFichier)
-        {
-            try
-            {
-                FileStream fs = new FileStream(nomFichier, FileMode.Create, FileAccess.Write);
-                StreamWriter sw = new StreamWriter(fs);
-
-                sw.WriteLine("Historique des parties : ");
-
-                for (int i = 0; i < compteur; i++)
-                {
-                    sw.WriteLine("Partie N°{0}, " + tab[i].info(), i + 1);
-                }
-
-                sw.WriteLine("Le Meilleur Score est : " + meilleurScore);
-
-                sw.Close();
-                fs.Close();
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine("Erreur : " + e.Message);
-            }
-            
-        }
-
         // TODO : Exercice 1.3 (Modularisation des interactions utilisateurs)
         static string GetString(string message)
         {
@@ -123,6 +85,7 @@ namespace JeuPoM
                 {
                     Console.WriteLine("Félicitations ! Vous avez trouvé la valeur correcte. \n");
 
+                    
                     Console.WriteLine("Nombre du Tentatives : " + tentatives);
 
                     if (tentatives < meilleurScore)
@@ -145,7 +108,7 @@ namespace JeuPoM
 
             // TODO : Exercice 1.4 (Modularisation des interactions utilisateurs)
             // TODO : Exercice 3.1 (Capture d’exception)
-            
+
             bool continuerJeu = false;
             while (!continuerJeu)
             {
@@ -194,11 +157,11 @@ namespace JeuPoM
 
             if (saveFileDialog.ShowDialog() == DialogResult.OK)
             {
-                afficheHistorique(Parties, historique, saveFileDialog.FileName);
+                Utilitaire.afficheHistorique(Parties, historique, saveFileDialog.FileName);
             }
             else
             {
-                afficheHistorique(Parties, historique);
+                Utilitaire.afficheHistorique(Parties, historique);
             }
         }
 
@@ -214,13 +177,22 @@ namespace JeuPoM
             {
                 string nom = GetString("\n Quel est votre nom ? ");
                 string prenom = GetString("\n Quel est votre prenom ? ");
+
                 joueur = new Personne(nom, prenom);
             }
-            
+            else if (reponse.ToLower() == "n")
+            {
+                Console.WriteLine("Vous avez choisi de ne pas vous identifier.\n");
+            }
+            else
+            {
+                Console.WriteLine("La valeur saisie n'est pas valide, SVP entrez 'O' ou 'N'");
+            }
+
             Jouer();
             ReJouer();
 
-            Console.WriteLine("Appuyez sur n'importe quelle touche pour quitter...");
+            Console.WriteLine("Appuyez sur n'importe quelle touche pour quitter...\nAu revoir");
             Console.ReadKey();
         }
     }

@@ -10,24 +10,42 @@ namespace JeuPoM
     {
         #region Attributs
 
-        public int valeur { get; set; }
+        private int valeur { get; set; }
         public int tentatives { get; set; }
+
+        #endregion
+
+        #region Membres statiques
+
+        private static int compteurParties = 0;
+
+        public static int getNbParties()
+        {
+            return compteurParties;
+        }
 
         #endregion
 
         #region Constructeurs
         public Partie()
-        {}
-
-        public Partie(int ValeurInti, int Tentatives)
         {
-            valeur = ValeurInti;
+        }
+
+        public Partie(int Valeur, int Tentatives)
+        {
+            valeur = Valeur;
             tentatives = Tentatives;
+            compteurParties++;
         }
         #endregion
 
         #region Méthodes
 
+        public int getValeur()
+        {
+            return valeur;
+        }
+        
         public string info()
         {
             return valeur.ToString() + " trouvé en " + tentatives.ToString() + " coup(s)";
